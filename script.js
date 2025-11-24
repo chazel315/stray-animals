@@ -234,20 +234,65 @@ const renderUI = () => {
     document.getElementById('round-counter').textContent = gameState.round;
 };
 
-function logMessage(message) {
+// 訊息佇列系統
+let messageQueue = [];
+let isProcessingQueue = false;
+
+/**
+ * 立即顯示訊息（不經過佇列）
+ */
+function logMessageInstant(message) {
     const logElement = document.getElementById('log');
     logElement.innerHTML += `<p>> ${message}</p>`;
-    logElement.scrollTop = logElement.scrollHeight; // 保持在底部
+    logElement.scrollTop = logElement.scrollHeight;
+}
+
+/**
+ * 加入訊息到佇列（會延遲顯示）
+ */
+function logMessage(message, delay = 300) {
+    messageQueue.push({ message, delay });
+    processMessageQueue();
+}
+
+/**
+ * 處理訊息佇列
+ */
+async function processMessageQueue() {
+    if (isProcessingQueue) return;
+    isProcessingQueue = true;
+
+    while (messageQueue.length > 0) {
+        const { message, delay } = messageQueue.shift();
+
+        // 顯示訊息
+        const logElement = document.getElementById('log');
+        logElement.innerHTML += `<p>> ${message}</p>`;
+        logElement.scrollTop = logElement.scrollHeight;
+
+        // 等待延遲
+        await new Promise(resolve => setTimeout(resolve, delay));
+    }
+
+    isProcessingQueue = false;
+}
+
+/**
+ * 清空訊息佇列（用於緊急情況）
+ */
+function clearMessageQueue() {
+    messageQueue = [];
+    isProcessingQueue = false;
 }
 
 const startRound = () => {
-    logMessage(`--- 第 ${gameState.round} 回合開始 ---`);
+    logMessage(`--- 第 ${gameState.round} 回合開始 ---`, 500);
 
     // 1. 決定順位
     const rand = Math.random();
     if (rand < 0.33) {
         gameState.playerTurnPosition = 1;
-        logMessage(`🥇 本回合您優先選擇！`);
+        logMessage(`🥇 本回合您優先選擇！`, 400);
     } else if (rand < 0.66) {
         gameState.playerTurnPosition = 2;
     } else {
@@ -264,7 +309,7 @@ const startRound = () => {
     // 如果有留存卡牌，先加入
     if (leftoverCard) {
         selectedCards.push(leftoverCard);
-        logMessage(`📦 上回合留存了: ${leftoverCard.name}`);
+        logMessage(`📦 上回合留存了: ${leftoverCard.name}`, 350);
     }
 
     // 計算本回合需要抽取的卡牌數量（基礎 4 張 + 抽牌獎勵）
@@ -283,7 +328,7 @@ const startRound = () => {
             for (let i = 0; i < cardsNeeded; i++) {
                 newCards.push(targetCard);
             }
-            logMessage(`🔄 本回合食物卡已全部替換為【${targetCard.name}】！`);
+            logMessage(`🔄 本回合食物卡已全部替換為【${targetCard.name}】！`, 600);
         } else {
             // 如果找不到目標卡牌，回退到隨機抽取
             const pool = foodCards.filter(c => !selectedCards.some(sc => sc.id === c.id));
@@ -325,7 +370,7 @@ const startRound = () => {
             const card1 = preLockedCards[0];
 
             currentRoundCards = currentRoundCards.filter(c => c.id !== card1.id);
-            logMessage(`🥈 ${preempter1Emoji} ${preempter1} 吃掉了【${card1.name}】。您是第二順位。`);
+            logMessage(`🥈 ${preempter1Emoji} ${preempter1} 吃掉了【${card1.name}】。您是第二順位。`, 600);
         } else if (preLockCount === 2) {
             // 順位 3: 兩個電腦陣營各吃掉一張卡 (可能是同一陣營)
             const preempter1 = getRandomElement(computerFactions);
@@ -336,7 +381,7 @@ const startRound = () => {
             const card2 = preLockedCards[1];
 
             currentRoundCards = currentRoundCards.filter(c => c.id !== card1.id && c.id !== card2.id);
-            logMessage(`🥉 ${preempter1Emoji} ${preempter1} 吃掉了【${card1.name}】，且 ${preempter2Emoji} ${preempter2} 吃掉了【${card2.name}】。您是第三順位！`);
+            logMessage(`🥉 ${preempter1Emoji} ${preempter1} 吃掉了【${card1.name}】，且 ${preempter2Emoji} ${preempter2} 吃掉了【${card2.name}】。您是第三順位！`, 700);
         }
     }
 
@@ -388,7 +433,7 @@ const handleCardClick = (cardId) => {
         return;
     }
 
-    logMessage(`你選擇了: ${card.name}`);
+    logMessage(`你選擇了: ${card.name}`, 400);
 
     // --- 玩家效果結算 ---
 
@@ -402,12 +447,12 @@ const handleCardClick = (cardId) => {
         cureList.forEach(s => {
             if (gameState.status[s]) gameState.status[s] = 0;
         });
-        logMessage(`✨ 身體淨化了！狀態已清除。`);
+        logMessage(`✨ 身體淨化了！狀態已清除。`, 500);
     } else if (statusEffect) {
         if (statusEffect === 'dead') {
             // 2. 死亡 (100% 觸發)
             gameState.currentHp = 0;
-            logMessage(`☠️ 致命陷阱！直接死亡。`);
+            logMessage(`☠️ 致命陷阱！直接死亡。`, 800);
         } else {
             // 3. 其他負面狀態 (50% 機率) - 顯示彈窗
             // 應用 HP 變化（在彈窗前先處理）
@@ -538,13 +583,13 @@ const continueCardClickProcess = (cardId) => {
             dimCard(elementToRemove);
         });
 
-        logMessage(`🗑️ 其他 ${extraDiscards.length} 張卡牌被丟棄了。`);
+        logMessage(`🗑️ 其他 ${extraDiscards.length} 張卡牌被丟棄了。`, 400);
     }
 
     // 設定留存卡牌
     leftoverCard = unpickedCards[unpickedCards.length - 1];
     if (leftoverCard) {
-        logMessage(`📦 ${leftoverCard.name} 被留到了下一回合`);
+        logMessage(`📦 ${leftoverCard.name} 被留到了下一回合`, 450);
     }
 
     // 移除玩家點擊的卡牌 (視覺上只留下留存卡)
@@ -773,7 +818,7 @@ const applyStatusEffects = () => {
                 const damage = effect.damage * count;
                 totalDamage += damage;
                 const cnName = STATUS_NAMES_CHINESE[status] || status;
-                logMessage(`⚠️ ${effect.icon} [${cnName}] 造成額外 ${damage} 點傷害`);
+                logMessage(`⚠️ ${effect.icon} [${cnName}] 造成額外 ${damage} 點傷害`, 400);
             }
         }
     });
@@ -805,7 +850,7 @@ const processEndOfRound = () => {
     let totalDamage = baseDamage + statusDamage;
 
     gameState.currentHp -= totalDamage;
-    logMessage(`📉 飢餔扣除 ${totalDamage} 點 HP (基礎: ${baseDamage}, 狀態: ${statusDamage})`);
+    logMessage(`📉 飢餓扣除 ${totalDamage} 點 HP (基礎: ${baseDamage}, 狀態: ${statusDamage})`, 500);
 
     // 3. 更新 UI
     renderUI();
@@ -831,21 +876,60 @@ const processEndOfRound = () => {
 const checkDeath = (cause = "傷重不治") => {
     if (gameState.currentHp <= 0) {
         logMessage(`💀 ${cause}... 遊戲結束。`);
-        alert(`遊戲結束！死因：${cause}。存活回合：${gameState.round}`);
 
-        // 切換回選擇畫面
-        document.getElementById('game-screen').classList.add('hidden');
-        document.getElementById('selection-screen').classList.remove('hidden');
-
-        // 重置部分狀態 (雖然 startGame 會重置，但這裡可以做一些清理或提示)
-        logMessage(`--- 請重新選擇角色開始新遊戲 ---`);
-
-        // 清除留存卡牌，避免影響下一局
-        leftoverCard = null;
-        currentRoundCards = [];
+        // 使用自訂彈窗而非 alert，以支援所有平台（包括 Messenger）
+        showDeathModal(cause, gameState.round);
 
         return true;
     }
     return false;
 };
+
+/**
+ * 顯示死亡畫面彈窗
+ */
+const showDeathModal = (cause, rounds) => {
+    // 創建彈窗
+    const modal = document.createElement('div');
+    modal.id = 'death-modal';
+    modal.className = 'event-modal';
+
+    modal.innerHTML = `
+        <div class="event-modal-content" style="background: linear-gradient(135deg, #ef4444 0%, #7f1d1d 100%);">
+            <div class="event-icon" style="font-size: 80px;">💀</div>
+            <h2 class="event-title">遊戲結束</h2>
+            <p class="event-description">死因：${cause}</p>
+            <p class="text-xl text-yellow-300 mb-4">存活回合：${rounds}</p>
+            <button class="event-confirm-btn" onclick="dismissDeathModal()">
+                重新開始
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+};
+
+/**
+ * 關閉死亡畫面彈窗
+ */
+const dismissDeathModal = () => {
+    const modal = document.getElementById('death-modal');
+    if (modal) {
+        modal.remove();
+    }
+
+    // 切換回選擇畫面
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('selection-screen').classList.remove('hidden');
+
+    // 重置部分狀態
+    logMessage(`--- 請重新選擇角色開始新遊戲 ---`);
+
+    // 清除留存卡牌，避免影響下一局
+    leftoverCard = null;
+    currentRoundCards = [];
+};
+
+// 將函數設為全域，以便 onclick 可以呼叫
+window.dismissDeathModal = dismissDeathModal;
 
