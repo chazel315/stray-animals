@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街角求生錄：餵食的代價</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-800 text-white min-h-screen p-8">
+
+    <!-- 起始畫面 -->
+    <div id="splash-screen" class="min-h-screen flex flex-col justify-center items-center text-center">
+        <h1 class="text-3xl md:text-5xl font-serif mb-12 text-gray-200 animate-fadeIn">
+            某一天醒來，我成了流浪動物⋯⋯想辦法生活下去吧！
+        </h1>
+        <button id="start-button"
+            class="px-8 py-4 bg-yellow-500 text-gray-900 text-xl font-bold rounded-full shadow-lg hover:bg-yellow-400 transition transform hover:scale-105">
+            START
+        </button>
+    </div>
+
+    <!-- 角色選擇畫面 -->
+    <div id="selection-screen" class="hidden min-h-screen flex flex-col justify-center items-center px-4">
+        <h1 class="text-3xl font-bold mb-4 text-yellow-400">你是誰？選擇你的求生之道</h1>
+        <p class="text-gray-400 mb-8">每個角色都有獨特的生存策略</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+            <button
+                class="faction-button bg-yellow-600 hover:bg-yellow-700 p-6 rounded-lg shadow-xl transition transform hover:scale-105 text-left"
+                data-faction="dog">
+                <div class="text-center">
+                    <span class="text-6xl">🐶</span>
+                    <h2 class="text-2xl font-bold mt-2">狗 (HP 6)</h2>
+                </div>
+                <p class="text-sm mt-4 text-gray-200 leading-relaxed">
+                    體質強悍，初始血量高，但食性雜亂，易受大型危險品傷害。
+                </p>
+            </button>
+            <button
+                class="faction-button bg-blue-600 hover:bg-blue-700 p-6 rounded-lg shadow-xl transition transform hover:scale-105 text-left"
+                data-faction="cat">
+                <div class="text-center">
+                    <span class="text-6xl">🐱</span>
+                    <h2 class="text-2xl font-bold mt-2">貓 (HP 6)</h2>
+                </div>
+                <p class="text-sm mt-4 text-gray-200 leading-relaxed">
+                    動作靈活，不易中毒，但容易因銳利物受傷，且對人類食物極度敏感。
+                </p>
+            </button>
+            <button
+                class="faction-button bg-red-600 hover:bg-red-700 p-6 rounded-lg shadow-xl transition transform hover:scale-105 text-left"
+                data-faction="rat">
+                <div class="text-center">
+                    <span class="text-6xl">🐀</span>
+                    <h2 class="text-2xl font-bold mt-2">鼠 (HP 2)</h2>
+                </div>
+                <p class="text-sm mt-4 text-gray-200 leading-relaxed">
+                    生命力頑強，從廚餘中獲利高，但初始血量極低，生存風險最高。
+                </p>
+            </button>
+        </div>
+        <p class="mt-8 text-gray-400">點擊開始你的求生挑戰</p>
+    </div>
+
+    <div id="game-screen" class="hidden">
+
+        <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 bg-gray-700 rounded-lg gap-2">
+            <h2 id="player-status" class="text-lg md:text-2xl font-semibold"></h2>
+            <div class="text-base md:text-xl">
+                回合數: <span id="round-counter" class="font-bold text-yellow-300">0</span>
+            </div>
+        </div>
+
+        <div id="card-area" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        </div>
+
+        <div id="log"
+            class="bg-gray-700 p-3 md:p-4 h-48 md:h-32 overflow-y-auto rounded-lg text-xs md:text-sm text-gray-300">
+            <p>遊戲訊息:</p>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

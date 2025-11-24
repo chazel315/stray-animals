@@ -1,0 +1,193 @@
+/* Add custom styles here if needed, mostly using Tailwind now */
+
+.dimmed {
+    opacity: 0.3;
+    /* 設置透明度，使卡牌變暗 */
+    pointer-events: none;
+    /* 禁用點擊，防止誤點 */
+}
+
+/* 卡牌尺寸調整 - 手機上縮小 */
+#card-area>div {
+    width: 100% !important;
+    /* 手機上使用全寬 */
+    height: auto !important;
+    min-width: 140px;
+    min-height: 200px;
+}
+
+/* 桌面上的卡牌尺寸 */
+@media (min-width: 768px) {
+    #card-area>div {
+        width: 200px !important;
+        height: 280px !important;
+        min-width: 200px;
+        min-height: 280px;
+    }
+}
+
+/* 卡牌圖片 (Emoji) */
+#card-area>div>div:first-child {
+    font-size: 4rem !important;
+}
+
+/* 卡牌標題 */
+#card-area h3 {
+    font-size: 1.2rem !important;
+}
+
+/* 增加狀態顯示區域大小 */
+#player-status {
+    font-size: 1.125rem !important;
+    /* 手機上縮小 */
+    padding: 0.5rem;
+    line-height: 1.4;
+    word-break: break-word;
+    /* 防止溢出 */
+}
+
+@media (min-width: 768px) {
+    #player-status {
+        font-size: 2rem !important;
+        padding: 1rem;
+    }
+}
+
+/* 增加 Log 區域高度 */
+#log {
+    height: 250px !important;
+    font-size: 1rem !important;
+}
+
+/* 事件卡彈窗樣式 */
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+    padding: 1rem;
+    /* 手機上的內邊距 */
+}
+
+.event-modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    /* 手機上使用 90% 寬度 */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease-out;
+}
+
+/* 手機上減少 padding */
+@media (max-width: 768px) {
+    .event-modal-content {
+        padding: 1.5rem;
+    }
+}
+
+.event-icon {
+    margin-bottom: 1rem;
+    animation: bounce 0.6s ease-in-out;
+}
+
+.event-title {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 桌面上增大標題 */
+@media (min-width: 768px) {
+    .event-title {
+        font-size: 2rem;
+    }
+}
+
+.event-description {
+    color: #f0f0f0;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* 桌面上增大描述 */
+@media (min-width: 768px) {
+    .event-description {
+        font-size: 1.2rem;
+    }
+}
+
+.event-confirm-btn {
+    background-color: #fbbf24;
+    color: #1f2937;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.event-confirm-btn:hover {
+    background-color: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.event-confirm-btn:active {
+    transform: translateY(0);
+}
+
+/* 動畫效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 起始畫面動畫 */
+.animate-fadeIn {
+    animation: fadeIn 2s ease-in-out;
+}
